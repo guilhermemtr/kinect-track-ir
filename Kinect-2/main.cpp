@@ -1,3 +1,6 @@
+#include <chrono>
+#include <thread>
+
 #include "head_tracker.h"
 #include "yal.h"
 
@@ -14,6 +17,7 @@ int main() {
 	while (ht)
 	{
 		ht->update();
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 	int a;
 	std::cin >> a;

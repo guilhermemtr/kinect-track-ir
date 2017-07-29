@@ -14,6 +14,8 @@ public:
 
 	void setup();
 	void update();
+	head_data* get_head_data(int i);
+
 private:
 	void setup_readers();
 	void release_readers();

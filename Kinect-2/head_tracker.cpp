@@ -33,6 +33,7 @@ head_tracker::head_tracker() :
 	{
 		m_pFaceFrameSources[i] = nullptr;
 		m_pFaceFrameReaders[i] = nullptr;
+		m_hHeads[i] = new head_data();
 	}
 
 	__yal_log(__YAL_INFO, "Getting default kinnect sensor\n");
@@ -60,6 +61,11 @@ head_tracker::~head_tracker()
 		__yal_log(__YAL_INFO, "Closing/unsubscribing the kinect sensor\n");
 		HRESULT hr = m_pKinectSensor->Close();
 		handleError(hr, 0, "Close Kinect Sensor failed");
+	}
+
+	for (int i = 0; i < BODY_COUNT; i++)
+	{
+		delete m_hHeads[i];
 	}
 
 	SafeRelease(m_pKinectSensor);
@@ -103,6 +109,22 @@ void head_tracker::setup_readers()
 
 	SafeRelease(pColorFrameSource);
 	SafeRelease(pBodyFrameSource);
+
+
+	// Initialize the Kinect and get the depth reader
+	IDepthFrameSource* pDepthFrameSource = NULL;
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pKinectSensor->get_DepthFrameSource(&pDepthFrameSource);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDepthFrameSource->OpenReader(&m_pDepthFrameReader);
+	}
+
+	SafeRelease(pDepthFrameSource);
 }
 
 void head_tracker::release_readers()
@@ -114,6 +136,9 @@ void head_tracker::release_readers()
 		SafeRelease(m_pFaceFrameSources[i]);
 		SafeRelease(m_pFaceFrameReaders[i]);
 	}
+
+	// done with depth frame reader
+	SafeRelease(m_pDepthFrameReader);
 
 	// done with body frame reader
 	SafeRelease(m_pBodyFrameReader);
@@ -138,10 +163,14 @@ void head_tracker::setup()
 	}
 }
 
+head_data* head_tracker::get_head_data(int i)
+{
+	return m_hHeads[i];
+}
+
 void head_tracker::update()
 {
-	
-	if (!m_pColorFrameReader || !m_pBodyFrameReader)
+	if (!m_pColorFrameReader || !m_pBodyFrameReader || !m_pDepthFrameReader)
 	{
 		return;
 	}
@@ -164,32 +193,33 @@ void head_tracker::update()
 		{
 			// check if a valid face is tracked in this face frame
 			hr = pFaceFrame->get_IsTrackingIdValid(&bFaceTracked);
-			__yal_log(__YAL_INFO, "I'm watching you!\n");
 		}
 
 		if (SUCCEEDED(hr))
 		{
 			if (bFaceTracked)
 			{
-				printf("tracking face\n");
 				IFaceFrameResult* pFaceFrameResult = nullptr;
 				RectI faceBox = { 0 };
 				PointF facePoints[FacePointType::FacePointType_Count];
 				Vector4 faceRotation;
 				DetectionResult faceProperties[FaceProperty::FaceProperty_Count];
 
+
 				hr = pFaceFrame->get_FaceFrameResult(&pFaceFrameResult);
 
 				// need to verify if pFaceFrameResult contains data before trying to access it
 				if (SUCCEEDED(hr) && pFaceFrameResult != nullptr)
 				{
-					// hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
-					hr = pFaceFrameResult->get_FaceBoundingBoxInInfraredSpace(&faceBox);
+					hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
+					// hr = pFaceFrameResult->get_FaceBoundingBoxInInfraredSpace(&faceBox);
 
 					pos_t pos = m_hHeads[iFace]->get_pos();
 					rot_t rot = m_hHeads[iFace]->get_rot();
 					
-
+					pos.axis[x] = faceBox.Left;
+					pos.axis[y] = faceBox.Bottom;
+					pos.axis[z] = 10;
 					if (SUCCEEDED(hr))
 					{
 						hr = pFaceFrameResult->GetFacePointsInColorSpace(FacePointType::FacePointType_Count, facePoints);
@@ -203,14 +233,14 @@ void head_tracker::update()
 					// extract face rotation in degrees as Euler angles
 					getFaceRotationInDegrees(&faceRotation, &(rot.axis[yaw]), &(rot.axis[pitch]), &(rot.axis[roll]));
 					m_hHeads[iFace]->set_rot(rot);
-					printf("Yaw:%d\nPitch:%d\nRoll:%d\n", rot.axis[yaw], rot.axis[pitch], rot.axis[roll]);
+					m_hHeads[iFace]->set_pos(pos);
 				}
 
 				SafeRelease(pFaceFrameResult);
 			}
 			else
 			{
-				printf("not tracking face\n");
+				// printf("not tracking face\n");
 				// face tracking is not valid - attempt to fix the issue
 				// a valid body is required to perform this step
 				if (bHaveBodyData)
@@ -249,6 +279,80 @@ void head_tracker::update()
 			SafeRelease(ppBodies[i]);
 		}
 	}
+
+	IDepthFrame* pDepthFrame = NULL;
+	hr = m_pDepthFrameReader->AcquireLatestFrame(&pDepthFrame);
+	IFrameDescription* pFrameDescription = NULL;
+	USHORT nDepthMinReliableDistance = 0;
+	USHORT nDepthMaxDistance = 0;
+	int nWidth = 0;
+	int nHeight = 0;
+	UINT nBufferSize = 0;
+	UINT16 *pBuffer = NULL;
+
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDepthFrame->get_FrameDescription(&pFrameDescription);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameDescription->get_Width(&nWidth);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameDescription->get_Height(&nHeight);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDepthFrame->get_DepthMinReliableDistance(&nDepthMinReliableDistance);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		// In order to see the full range of depth (including the less reliable far field depth)
+		// we are setting nDepthMaxDistance to the extreme potential depth threshold
+		// nDepthMaxDistance = USHRT_MAX;
+
+		// Note:  If you wish to filter by reliable depth distance, uncomment the following line.
+		hr = pDepthFrame->get_DepthMaxReliableDistance(&nDepthMaxDistance);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDepthFrame->AccessUnderlyingBuffer(&nBufferSize, &pBuffer);
+	}
+
+
+	// end pixel is start + width*height - 1
+	const UINT16* pBufferEnd = pBuffer + (nWidth * nHeight);
+
+	while (pBuffer < pBufferEnd)
+	{
+		USHORT depth = *pBuffer;
+
+		// To convert to a byte, we're discarding the most-significant
+		// rather than least-significant bits.
+		// We're preserving detail, although the intensity will "wrap."
+		// Values outside the reliable depth range are mapped to 0 (black).
+
+		// Note: Using conditionals in this loop could degrade performance.
+		// Consider using a lookup table instead when writing production code.
+		
+
+		BYTE intensity = static_cast<BYTE>((depth >= nDepthMinReliableDistance) && (depth <= nDepthMaxDistance) ? (depth % 256) : 0);
+		pos_t pos = m_hHeads[0]->get_pos();
+		pos.axis[z] = depth;
+		m_hHeads[0]->set_pos(pos);
+
+		++pBuffer;
+	}
+
+	SafeRelease(pFrameDescription);
+	SafeRelease(pDepthFrame);
 }
 
 HRESULT head_tracker::update_bodies(IBody** ppBodies)
