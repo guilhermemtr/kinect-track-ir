@@ -27,8 +27,9 @@ public:
 	void set_pos(pos_t pos);
 	void set_rot(rot_t rot);
 
+	// shouldn't exist: only for debugging
+	void log_head_data(void);
 private:
 	pos_t pos;
 	rot_t rot;
 };
-

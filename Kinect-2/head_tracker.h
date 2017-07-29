@@ -3,6 +3,7 @@
 #include "utils.h"
 
 #include "head_data.h"
+#include "depth_frame_data.h"
 
 
 

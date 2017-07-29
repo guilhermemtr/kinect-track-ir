@@ -168,6 +168,7 @@ head_data* head_tracker::get_head_data(int i)
 	return m_hHeads[i];
 }
 
+
 void head_tracker::update()
 {
 	if (!m_pColorFrameReader || !m_pBodyFrameReader || !m_pDepthFrameReader)
@@ -176,6 +177,12 @@ void head_tracker::update()
 	}
 	
 	HRESULT hr;
+
+	// get depth data.
+	// treat each of the bodies.
+
+	depth_frame_data dfd(m_pDepthFrameReader);
+	
 	IBody* ppBodies[BODY_COUNT] = { 0 };
 	bool bHaveBodyData = SUCCEEDED(update_bodies(ppBodies));
 
@@ -217,9 +224,9 @@ void head_tracker::update()
 					pos_t pos = m_hHeads[iFace]->get_pos();
 					rot_t rot = m_hHeads[iFace]->get_rot();
 					
-					pos.axis[x] = faceBox.Left;
-					pos.axis[y] = faceBox.Bottom;
-					pos.axis[z] = 10;
+					pos.axis[x] = (faceBox.Left + faceBox.Right) >> 1;
+					pos.axis[y] = (faceBox.Bottom + faceBox.Top) >> 1;
+					pos.axis[z] = dfd.get_depth(pos.axis[x], pos.axis[y]);
 					if (SUCCEEDED(hr))
 					{
 						hr = pFaceFrameResult->GetFacePointsInColorSpace(FacePointType::FacePointType_Count, facePoints);
@@ -234,6 +241,7 @@ void head_tracker::update()
 					getFaceRotationInDegrees(&faceRotation, &(rot.axis[yaw]), &(rot.axis[pitch]), &(rot.axis[roll]));
 					m_hHeads[iFace]->set_rot(rot);
 					m_hHeads[iFace]->set_pos(pos);
+					m_hHeads[iFace]->log_head_data();
 				}
 
 				SafeRelease(pFaceFrameResult);
@@ -279,80 +287,6 @@ void head_tracker::update()
 			SafeRelease(ppBodies[i]);
 		}
 	}
-
-	IDepthFrame* pDepthFrame = NULL;
-	hr = m_pDepthFrameReader->AcquireLatestFrame(&pDepthFrame);
-	IFrameDescription* pFrameDescription = NULL;
-	USHORT nDepthMinReliableDistance = 0;
-	USHORT nDepthMaxDistance = 0;
-	int nWidth = 0;
-	int nHeight = 0;
-	UINT nBufferSize = 0;
-	UINT16 *pBuffer = NULL;
-
-
-	if (SUCCEEDED(hr))
-	{
-		hr = pDepthFrame->get_FrameDescription(&pFrameDescription);
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		hr = pFrameDescription->get_Width(&nWidth);
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		hr = pFrameDescription->get_Height(&nHeight);
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		hr = pDepthFrame->get_DepthMinReliableDistance(&nDepthMinReliableDistance);
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		// In order to see the full range of depth (including the less reliable far field depth)
-		// we are setting nDepthMaxDistance to the extreme potential depth threshold
-		// nDepthMaxDistance = USHRT_MAX;
-
-		// Note:  If you wish to filter by reliable depth distance, uncomment the following line.
-		hr = pDepthFrame->get_DepthMaxReliableDistance(&nDepthMaxDistance);
-	}
-
-	if (SUCCEEDED(hr))
-	{
-		hr = pDepthFrame->AccessUnderlyingBuffer(&nBufferSize, &pBuffer);
-	}
-
-
-	// end pixel is start + width*height - 1
-	const UINT16* pBufferEnd = pBuffer + (nWidth * nHeight);
-
-	while (pBuffer < pBufferEnd)
-	{
-		USHORT depth = *pBuffer;
-
-		// To convert to a byte, we're discarding the most-significant
-		// rather than least-significant bits.
-		// We're preserving detail, although the intensity will "wrap."
-		// Values outside the reliable depth range are mapped to 0 (black).
-
-		// Note: Using conditionals in this loop could degrade performance.
-		// Consider using a lookup table instead when writing production code.
-		
-
-		BYTE intensity = static_cast<BYTE>((depth >= nDepthMinReliableDistance) && (depth <= nDepthMaxDistance) ? (depth % 256) : 0);
-		pos_t pos = m_hHeads[0]->get_pos();
-		pos.axis[z] = depth;
-		m_hHeads[0]->set_pos(pos);
-
-		++pBuffer;
-	}
-
-	SafeRelease(pFrameDescription);
-	SafeRelease(pDepthFrame);
 }
 
 HRESULT head_tracker::update_bodies(IBody** ppBodies)

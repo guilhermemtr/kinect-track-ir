@@ -14,6 +14,8 @@
 
 #include "yal.h"
 
+#ifndef __KINECT_TRACK_IR_UTILS__
+#define __KINECT_TRACK_IR_UTILS__
 void handleError(HRESULT hr, int critical, char* msg, ...);
 
 void getFaceRotationInDegrees(const Vector4* pQuaternion, int* pYaw, int* pPitch, int* pRoll);
@@ -28,3 +30,5 @@ inline void SafeRelease(Interface *& pInterfaceToRelease)
 		pInterfaceToRelease = NULL;
 	}
 }
+
+#endif
