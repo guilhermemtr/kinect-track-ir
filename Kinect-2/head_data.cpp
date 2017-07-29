@@ -7,8 +7,8 @@ head_data::head_data()
 	__yal_log(__YAL_INFO, "Creating head_data object\n");
 	for (int i = 0; i < HEAD_DATA_AXIS; i++)
 	{
-		this->rot[i] = 0;
-		this->pos[i] = 0;
+		this->rot.axis[i] = 0;
+		this->pos.axis[i] = 0;
 	}
 }
 
@@ -19,34 +19,22 @@ head_data::~head_data()
 }
 
 
-void head_data::get_pos(pos_t **pos)
+pos_t head_data::get_pos()
 {
-	for (int i = 0; i < HEAD_DATA_AXIS; i++)
-	{
-		*(pos[i]) = this->pos[i];
-	}
+	return this->pos;
 }
 
-void head_data::get_rot(rot_t **rot)
+rot_t head_data::get_rot()
 {
-	for (int i = 0; i < HEAD_DATA_AXIS; i++)
-	{
-		*(rot[i]) = this->rot[i];
-	}
+	return this->rot;
 }
 
-void head_data::set_pos(pos_t *pos)
+void head_data::set_pos(pos_t pos)
 {
-	for (int i = 0; i < HEAD_DATA_AXIS; i++)
-	{
-		this->pos[i] = pos[i];
-	}
+	this->pos = pos;
 }
 
-void head_data::set_rot(rot_t *rot)
+void head_data::set_rot(rot_t rot)
 {
-	for (int i = 0; i < HEAD_DATA_AXIS; i++)
-	{
-		this->rot[i] = rot[i];
-	}
+	this->rot = rot;
 }

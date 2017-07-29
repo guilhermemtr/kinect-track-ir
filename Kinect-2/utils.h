@@ -16,6 +16,8 @@
 
 void handleError(HRESULT hr, int critical, char* msg, ...);
 
+void getFaceRotationInDegrees(const Vector4* pQuaternion, int* pYaw, int* pPitch, int* pRoll);
+
 // Safe release for interfaces
 template<class Interface>
 inline void SafeRelease(Interface *& pInterfaceToRelease)

@@ -5,6 +5,8 @@
 static const DWORD c_FaceFrameFeatures =
 FaceFrameFeatures::FaceFrameFeatures_BoundingBoxInColorSpace
 | FaceFrameFeatures::FaceFrameFeatures_BoundingBoxInInfraredSpace
+| FaceFrameFeatures::FaceFrameFeatures_PointsInColorSpace
+| FaceFrameFeatures::FaceFrameFeatures_PointsInInfraredSpace
 | FaceFrameFeatures::FaceFrameFeatures_RotationOrientation;
 //| FaceFrameFeatures::;
 
@@ -181,12 +183,12 @@ void head_tracker::update()
 				// need to verify if pFaceFrameResult contains data before trying to access it
 				if (SUCCEEDED(hr) && pFaceFrameResult != nullptr)
 				{
-					pos_t pos[HEAD_DATA_AXIS];
-					rot_t rot[HEAD_DATA_AXIS];
+					// hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
+					hr = pFaceFrameResult->get_FaceBoundingBoxInInfraredSpace(&faceBox);
 
-					hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
-					m_hHeads[iFace]->get_pos((pos_t**) &pos);
-					m_hHeads[iFace]->get_rot((rot_t**) &rot);
+					pos_t pos = m_hHeads[iFace]->get_pos();
+					rot_t rot = m_hHeads[iFace]->get_rot();
+					
 
 					if (SUCCEEDED(hr))
 					{
@@ -198,10 +200,10 @@ void head_tracker::update()
 						hr = pFaceFrameResult->get_FaceRotationQuaternion(&faceRotation);
 					}
 
-					if (SUCCEEDED(hr))
-					{
-						hr = pFaceFrameResult->GetFaceProperties(FaceProperty::FaceProperty_Count, faceProperties);
-					}
+					// extract face rotation in degrees as Euler angles
+					getFaceRotationInDegrees(&faceRotation, &(rot.axis[yaw]), &(rot.axis[pitch]), &(rot.axis[roll]));
+					m_hHeads[iFace]->set_rot(rot);
+					printf("Yaw:%d\nPitch:%d\nRoll:%d\n", rot.axis[yaw], rot.axis[pitch], rot.axis[roll]);
 				}
 
 				SafeRelease(pFaceFrameResult);
