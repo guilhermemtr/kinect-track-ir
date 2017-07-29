@@ -4,17 +4,8 @@
 
 static const DWORD c_FaceFrameFeatures =
 FaceFrameFeatures::FaceFrameFeatures_BoundingBoxInColorSpace
-| FaceFrameFeatures::FaceFrameFeatures_PointsInColorSpace
-| FaceFrameFeatures::FaceFrameFeatures_PointsInColorSpace
-| FaceFrameFeatures::FaceFrameFeatures_RotationOrientation
-| FaceFrameFeatures::FaceFrameFeatures_Happy
-| FaceFrameFeatures::FaceFrameFeatures_RightEyeClosed
-| FaceFrameFeatures::FaceFrameFeatures_LeftEyeClosed
-| FaceFrameFeatures::FaceFrameFeatures_MouthOpen
-| FaceFrameFeatures::FaceFrameFeatures_MouthMoved
-| FaceFrameFeatures::FaceFrameFeatures_LookingAway
-| FaceFrameFeatures::FaceFrameFeatures_Glasses
-| FaceFrameFeatures::FaceFrameFeatures_FaceEngagement;
+| FaceFrameFeatures::FaceFrameFeatures_BoundingBoxInInfraredSpace
+| FaceFrameFeatures::FaceFrameFeatures_RotationOrientation;
 //| FaceFrameFeatures::;
 
 head_tracker::head_tracker() :
@@ -46,21 +37,12 @@ head_tracker::head_tracker() :
 
 	HRESULT hr;
 	hr = GetDefaultKinectSensor(&m_pKinectSensor);
-	handleError(hr, "Get Default Kinect Sensor failed", 1);
+	handleError(hr, 1, "Get Default Kinect Sensor failed\n");
 
 	__yal_log(__YAL_INFO, "Opening/subscribing to the kinect sensor\n");
 	hr = m_pKinectSensor->Open();
-	handleError(hr, "Open Kinect Sensor failed", 1);
+	handleError(hr, 1, "Open Kinect Sensor failed\n");
 
-	if (m_pKinectSensor)
-	{
-		__yal_log(__YAL_DBG, "Setting up readers and sources\n");
-		setup_readers();
-	}
-	else
-	{
-		__yal_log(__YAL_DBG, "Failed getting default kinect sensor\n");
-	}
 	__yal_log(__YAL_INFO, "Leaving head_tracker constructor\n");
 }
 
@@ -75,7 +57,7 @@ head_tracker::~head_tracker()
 	{
 		__yal_log(__YAL_INFO, "Closing/unsubscribing the kinect sensor\n");
 		HRESULT hr = m_pKinectSensor->Close();
-		handleError(hr, "Close Kinect Sensor failed", 0);
+		handleError(hr, 0, "Close Kinect Sensor failed");
 	}
 
 	SafeRelease(m_pKinectSensor);
@@ -91,33 +73,30 @@ void head_tracker::setup_readers()
 
 	HRESULT hr;
 	hr = m_pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
-	handleError(hr, "Get coordinate mapper failed", 1);
+	handleError(hr, 1, "Get coordinate mapper failed\n");
 
 	hr = m_pKinectSensor->get_ColorFrameSource(&pColorFrameSource);
-	handleError(hr, "Get color frame source failed", 1);
+	handleError(hr, 1, "Get color frame source failed\n");
 
 	hr = pColorFrameSource->OpenReader(&m_pColorFrameReader);
-	handleError(hr, "Color frame source: open reader failed", 1);
+	handleError(hr, 1, "Color frame source: open reader failed\n");
 
 	hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
-	handleError(hr, "get body frame source failed", 1);
+	handleError(hr, 1, "get body frame source failed\n");
 
 	hr = pBodyFrameSource->OpenReader(&m_pBodyFrameReader);
-	handleError(hr, "Body frame source: open reader failed", 1);
+	handleError(hr, 1, "Body frame source: open reader failed\n");
 
 	// create a face frame source + reader to track each body in the fov
 	for (int i = 0; i < BODY_COUNT; i++)
 	{
 		// create the face frame source by specifying the required face frame features
 		hr = CreateFaceFrameSource(m_pKinectSensor, 0, c_FaceFrameFeatures, &m_pFaceFrameSources[i]);
-		handleError(hr, "Create Face Frame Source failed", 0);
+		handleError(hr, 1, "Create Face Frame Source failed: %d\n", i);
 
 		// open the corresponding reader
-		if (m_pFaceFrameSources[i])
-		{
-			hr = m_pFaceFrameSources[i]->OpenReader(&m_pFaceFrameReaders[i]);
-			handleError(hr, "Face Frame Sources: open reader failed", 0);
-		}
+		hr = m_pFaceFrameSources[i]->OpenReader(&m_pFaceFrameReaders[i]);
+		handleError(hr, 1, "Face Frame Sources: open reader failed: %d\n", i);
 	}
 
 	SafeRelease(pColorFrameSource);
@@ -144,13 +123,27 @@ void head_tracker::release_readers()
 	SafeRelease(m_pCoordinateMapper);
 }
 
+void head_tracker::setup()
+{
+	if (m_pKinectSensor)
+	{
+		__yal_log(__YAL_DBG, "Setting up readers and sources\n");
+		setup_readers();
+	}
+	else
+	{
+		__yal_log(__YAL_DBG, "Failed getting default kinect sensor\n");
+	}
+}
+
 void head_tracker::update()
 {
+	
 	if (!m_pColorFrameReader || !m_pBodyFrameReader)
 	{
 		return;
 	}
-
+	
 	HRESULT hr;
 	IBody* ppBodies[BODY_COUNT] = { 0 };
 	bool bHaveBodyData = SUCCEEDED(update_bodies(ppBodies));
@@ -158,23 +151,25 @@ void head_tracker::update()
 	// iterate through each face reader
 	for (int iFace = 0; iFace < BODY_COUNT; ++iFace)
 	{
+		
+
 		// retrieve the latest face frame from this reader
 		IFaceFrame* pFaceFrame = nullptr;
-		if (!m_pFaceFrameReaders[iFace]) continue;
-		else __yal_log(__YAL_INFO, "I'm watching you!\n");
 		hr = m_pFaceFrameReaders[iFace]->AcquireLatestFrame(&pFaceFrame);
 
 		BOOLEAN bFaceTracked = false;
-		if (SUCCEEDED(hr) && nullptr != pFaceFrame)
+		if (SUCCEEDED(hr) && pFaceFrame != nullptr)
 		{
 			// check if a valid face is tracked in this face frame
 			hr = pFaceFrame->get_IsTrackingIdValid(&bFaceTracked);
+			__yal_log(__YAL_INFO, "I'm watching you!\n");
 		}
 
 		if (SUCCEEDED(hr))
 		{
 			if (bFaceTracked)
 			{
+				printf("tracking face\n");
 				IFaceFrameResult* pFaceFrameResult = nullptr;
 				RectI faceBox = { 0 };
 				PointF facePoints[FacePointType::FacePointType_Count];
@@ -186,7 +181,12 @@ void head_tracker::update()
 				// need to verify if pFaceFrameResult contains data before trying to access it
 				if (SUCCEEDED(hr) && pFaceFrameResult != nullptr)
 				{
+					pos_t pos[HEAD_DATA_AXIS];
+					rot_t rot[HEAD_DATA_AXIS];
+
 					hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
+					m_hHeads[iFace]->get_pos((pos_t**) &pos);
+					m_hHeads[iFace]->get_rot((rot_t**) &rot);
 
 					if (SUCCEEDED(hr))
 					{
@@ -208,6 +208,7 @@ void head_tracker::update()
 			}
 			else
 			{
+				printf("not tracking face\n");
 				// face tracking is not valid - attempt to fix the issue
 				// a valid body is required to perform this step
 				if (bHaveBodyData)

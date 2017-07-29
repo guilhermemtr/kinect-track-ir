@@ -12,6 +12,7 @@ public:
 	head_tracker();
 	~head_tracker();
 
+	void setup();
 	void update();
 private:
 	void setup_readers();

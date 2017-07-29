@@ -10,6 +10,7 @@ int main() {
 	__yal_set_lvl_info();
 
 	head_tracker *ht = new head_tracker();
+	ht->setup();
 	while (ht)
 	{
 		ht->update();

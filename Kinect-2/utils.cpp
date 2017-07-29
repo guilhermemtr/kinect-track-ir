@@ -6,11 +6,15 @@ void awaitInput()
 	std::cin >> a;
 }
 
-void handleError(HRESULT hr, char* msg, int critical)
+void handleError(HRESULT hr, int critical, char* msg, ...)
 {
+	va_list arg;
+
 	if (FAILED(hr))
 	{
-		std::cerr << msg << std::endl;
+		va_start(arg, msg);
+		vfprintf(stderr, msg, arg);
+		va_end(arg);
 		if (critical)
 		{
 			awaitInput();

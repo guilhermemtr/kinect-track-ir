@@ -1,5 +1,5 @@
+#include <stdio.h>
 #include <iostream>
-#include <Kinect.h>
 
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
@@ -7,10 +7,14 @@
 #include <cmath>
 #include <math.h>
 
+#include <stdarg.h>
+
+#include <Kinect.h>
+
 
 #include "yal.h"
 
-void handleError(HRESULT hr, char* msg, int critical);
+void handleError(HRESULT hr, int critical, char* msg, ...);
 
 // Safe release for interfaces
 template<class Interface>
