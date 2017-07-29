@@ -64,7 +64,6 @@ head_tracker::head_tracker() :
 	__yal_log(__YAL_INFO, "Leaving head_tracker constructor\n");
 }
 
-
 head_tracker::~head_tracker()
 {
 	__yal_log(__YAL_INFO, "Destroying head_tracker object\n");
@@ -82,26 +81,6 @@ head_tracker::~head_tracker()
 	SafeRelease(m_pKinectSensor);
 }
 
-void head_tracker::release_readers()
-{
-	__yal_log(__YAL_INFO, "Releasing readers and so on\n");
-	// done with face sources and readers
-	for (int i = 0; i < BODY_COUNT; i++)
-	{
-		SafeRelease(m_pFaceFrameSources[i]);
-		SafeRelease(m_pFaceFrameReaders[i]);
-	}
-
-	// done with body frame reader
-	SafeRelease(m_pBodyFrameReader);
-
-	// done with color frame reader
-	SafeRelease(m_pColorFrameReader);
-
-	// done with coordinate mapper
-	SafeRelease(m_pCoordinateMapper);
-}
-
 void head_tracker::setup_readers()
 {
 	__yal_log(__YAL_INFO, "Setting up the kinect readers\n");
@@ -113,7 +92,7 @@ void head_tracker::setup_readers()
 	HRESULT hr;
 	hr = m_pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
 	handleError(hr, "Get coordinate mapper failed", 1);
-	
+
 	hr = m_pKinectSensor->get_ColorFrameSource(&pColorFrameSource);
 	handleError(hr, "Get color frame source failed", 1);
 
@@ -143,4 +122,146 @@ void head_tracker::setup_readers()
 
 	SafeRelease(pColorFrameSource);
 	SafeRelease(pBodyFrameSource);
+}
+
+void head_tracker::release_readers()
+{
+	__yal_log(__YAL_INFO, "Releasing readers and so on\n");
+	// done with face sources and readers
+	for (int i = 0; i < BODY_COUNT; i++)
+	{
+		SafeRelease(m_pFaceFrameSources[i]);
+		SafeRelease(m_pFaceFrameReaders[i]);
+	}
+
+	// done with body frame reader
+	SafeRelease(m_pBodyFrameReader);
+
+	// done with color frame reader
+	SafeRelease(m_pColorFrameReader);
+
+	// done with coordinate mapper
+	SafeRelease(m_pCoordinateMapper);
+}
+
+void head_tracker::update()
+{
+	if (!m_pColorFrameReader || !m_pBodyFrameReader)
+	{
+		return;
+	}
+
+	HRESULT hr;
+	IBody* ppBodies[BODY_COUNT] = { 0 };
+	bool bHaveBodyData = SUCCEEDED(update_bodies(ppBodies));
+
+	// iterate through each face reader
+	for (int iFace = 0; iFace < BODY_COUNT; ++iFace)
+	{
+		// retrieve the latest face frame from this reader
+		IFaceFrame* pFaceFrame = nullptr;
+		if (!m_pFaceFrameReaders[iFace]) continue;
+		else __yal_log(__YAL_INFO, "I'm watching you!\n");
+		hr = m_pFaceFrameReaders[iFace]->AcquireLatestFrame(&pFaceFrame);
+
+		BOOLEAN bFaceTracked = false;
+		if (SUCCEEDED(hr) && nullptr != pFaceFrame)
+		{
+			// check if a valid face is tracked in this face frame
+			hr = pFaceFrame->get_IsTrackingIdValid(&bFaceTracked);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			if (bFaceTracked)
+			{
+				IFaceFrameResult* pFaceFrameResult = nullptr;
+				RectI faceBox = { 0 };
+				PointF facePoints[FacePointType::FacePointType_Count];
+				Vector4 faceRotation;
+				DetectionResult faceProperties[FaceProperty::FaceProperty_Count];
+
+				hr = pFaceFrame->get_FaceFrameResult(&pFaceFrameResult);
+
+				// need to verify if pFaceFrameResult contains data before trying to access it
+				if (SUCCEEDED(hr) && pFaceFrameResult != nullptr)
+				{
+					hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
+
+					if (SUCCEEDED(hr))
+					{
+						hr = pFaceFrameResult->GetFacePointsInColorSpace(FacePointType::FacePointType_Count, facePoints);
+					}
+
+					if (SUCCEEDED(hr))
+					{
+						hr = pFaceFrameResult->get_FaceRotationQuaternion(&faceRotation);
+					}
+
+					if (SUCCEEDED(hr))
+					{
+						hr = pFaceFrameResult->GetFaceProperties(FaceProperty::FaceProperty_Count, faceProperties);
+					}
+				}
+
+				SafeRelease(pFaceFrameResult);
+			}
+			else
+			{
+				// face tracking is not valid - attempt to fix the issue
+				// a valid body is required to perform this step
+				if (bHaveBodyData)
+				{
+					// check if the corresponding body is tracked 
+					// if this is true then update the face frame source to track this body
+					IBody* pBody = ppBodies[iFace];
+					if (pBody != nullptr)
+					{
+						BOOLEAN bTracked = false;
+						hr = pBody->get_IsTracked(&bTracked);
+
+						UINT64 bodyTId;
+						if (SUCCEEDED(hr) && bTracked)
+						{
+							// get the tracking ID of this body
+							hr = pBody->get_TrackingId(&bodyTId);
+							if (SUCCEEDED(hr))
+							{
+								// update the face frame source with the tracking ID
+								m_pFaceFrameSources[iFace]->put_TrackingId(bodyTId);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		SafeRelease(pFaceFrame);
+	}
+
+	if (bHaveBodyData)
+	{
+		for (int i = 0; i < _countof(ppBodies); ++i)
+		{
+			SafeRelease(ppBodies[i]);
+		}
+	}
+}
+
+HRESULT head_tracker::update_bodies(IBody** ppBodies)
+{
+	HRESULT hr = E_FAIL;
+
+	if (m_pBodyFrameReader != nullptr)
+	{
+		IBodyFrame* pBodyFrame = nullptr;
+		hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
+		if (SUCCEEDED(hr))
+		{
+			hr = pBodyFrame->GetAndRefreshBodyData(BODY_COUNT, ppBodies);
+		}
+		SafeRelease(pBodyFrame);
+	}
+
+	return hr;
 }

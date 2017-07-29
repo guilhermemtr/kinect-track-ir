@@ -10,8 +10,10 @@ int main() {
 	__yal_set_lvl_info();
 
 	head_tracker *ht = new head_tracker();
-	ht->nop();
-
+	while (ht)
+	{
+		ht->update();
+	}
 	int a;
 	std::cin >> a;
 

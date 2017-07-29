@@ -2,6 +2,8 @@
 #include <Kinect.Face.h>
 #include "utils.h"
 
+#include "head_data.h"
+
 
 
 class head_tracker
@@ -10,12 +12,14 @@ public:
 	head_tracker();
 	~head_tracker();
 
-	void nop() { __yal_log(__YAL_INFO, "anything?\n"); }
+	void update();
 private:
 	void setup_readers();
 	void release_readers();
+	HRESULT update_bodies(IBody** ppBodies);
 
-
+	//  Head tracking variables
+	head_data *m_hHeads[BODY_COUNT];
 
 	// Instance variables
 	HWND                    m_hWnd;

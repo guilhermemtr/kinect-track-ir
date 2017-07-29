@@ -119,11 +119,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="head_data.cpp" />
     <ClCompile Include="head_tracker.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="head_data.h" />
     <ClInclude Include="head_tracker.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="utils.h" />
