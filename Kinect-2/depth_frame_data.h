@@ -24,4 +24,7 @@ private:
 
 	USHORT m_nDepthMinReliableDistance;
 	USHORT m_nDepthMaxDistance;
+
+	IDepthFrame* m_pDepthFrame;
+	IFrameDescription* m_pFrameDescription;
 };

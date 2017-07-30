@@ -20,6 +20,8 @@ public:
 private:
 	void setup_readers();
 	void release_readers();
+
+	void update_face(int i, IBody** ppBodies, bool bHaveBodyData, depth_frame_data dfd);
 	HRESULT update_bodies(IBody** ppBodies);
 
 	//  Head tracking variables

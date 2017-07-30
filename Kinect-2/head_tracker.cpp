@@ -168,6 +168,98 @@ head_data* head_tracker::get_head_data(int i)
 	return m_hHeads[i];
 }
 
+void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, depth_frame_data dfd)
+{
+	// retrieve the latest face frame from this reader
+	IFaceFrame* pFaceFrame = nullptr;
+	HRESULT hr = m_pFaceFrameReaders[iFace]->AcquireLatestFrame(&pFaceFrame);
+
+
+	BOOLEAN bFaceTracked = false;
+	if (SUCCEEDED(hr) && pFaceFrame != nullptr)
+	{
+		// check if a valid face is tracked in this face frame
+		hr = pFaceFrame->get_IsTrackingIdValid(&bFaceTracked);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		if (bFaceTracked)
+		{
+			IFaceFrameResult* pFaceFrameResult = nullptr;
+			RectI faceBox = { 0 };
+			PointF facePoints[FacePointType::FacePointType_Count];
+			Vector4 faceRotation;
+			DetectionResult faceProperties[FaceProperty::FaceProperty_Count];
+
+
+			hr = pFaceFrame->get_FaceFrameResult(&pFaceFrameResult);
+
+			// need to verify if pFaceFrameResult contains data before trying to access it
+			if (SUCCEEDED(hr) && pFaceFrameResult != nullptr)
+			{
+				// hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
+				hr = pFaceFrameResult->get_FaceBoundingBoxInInfraredSpace(&faceBox);
+
+				pos_t pos = m_hHeads[iFace]->get_pos();
+				rot_t rot = m_hHeads[iFace]->get_rot();
+
+				pos.axis[x] = (faceBox.Left + faceBox.Right) >> 1;
+				pos.axis[y] = (faceBox.Bottom + faceBox.Top) >> 1;
+				pos.axis[z] = dfd.get_depth(pos.axis[x], pos.axis[y]);
+				if (SUCCEEDED(hr))
+				{
+					hr = pFaceFrameResult->GetFacePointsInColorSpace(FacePointType::FacePointType_Count, facePoints);
+				}
+
+				if (SUCCEEDED(hr))
+				{
+					hr = pFaceFrameResult->get_FaceRotationQuaternion(&faceRotation);
+				}
+
+				// extract face rotation in degrees as Euler angles
+				getFaceRotationInDegrees(&faceRotation, &(rot.axis[yaw]), &(rot.axis[pitch]), &(rot.axis[roll]));
+				m_hHeads[iFace]->set_rot(rot);
+				m_hHeads[iFace]->set_pos(pos);
+				m_hHeads[iFace]->log_head_data();
+			}
+
+			SafeRelease(pFaceFrameResult);
+		}
+		else
+		{
+			// printf("not tracking face\n");
+			// face tracking is not valid - attempt to fix the issue
+			// a valid body is required to perform this step
+			if (bHaveBodyData)
+			{
+				// check if the corresponding body is tracked 
+				// if this is true then update the face frame source to track this body
+				IBody* pBody = ppBodies[iFace];
+				if (pBody != nullptr)
+				{
+					BOOLEAN bTracked = false;
+					hr = pBody->get_IsTracked(&bTracked);
+
+					UINT64 bodyTId;
+					if (SUCCEEDED(hr) && bTracked)
+					{
+						// get the tracking ID of this body
+						hr = pBody->get_TrackingId(&bodyTId);
+						if (SUCCEEDED(hr))
+						{
+							// update the face frame source with the tracking ID
+							m_pFaceFrameSources[iFace]->put_TrackingId(bodyTId);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	SafeRelease(pFaceFrame);
+}
+
 
 void head_tracker::update()
 {
@@ -186,98 +278,9 @@ void head_tracker::update()
 	IBody* ppBodies[BODY_COUNT] = { 0 };
 	bool bHaveBodyData = SUCCEEDED(update_bodies(ppBodies));
 
-	// iterate through each face reader
 	for (int iFace = 0; iFace < BODY_COUNT; ++iFace)
 	{
-		
-
-		// retrieve the latest face frame from this reader
-		IFaceFrame* pFaceFrame = nullptr;
-		hr = m_pFaceFrameReaders[iFace]->AcquireLatestFrame(&pFaceFrame);
-
-		BOOLEAN bFaceTracked = false;
-		if (SUCCEEDED(hr) && pFaceFrame != nullptr)
-		{
-			// check if a valid face is tracked in this face frame
-			hr = pFaceFrame->get_IsTrackingIdValid(&bFaceTracked);
-		}
-
-		if (SUCCEEDED(hr))
-		{
-			if (bFaceTracked)
-			{
-				IFaceFrameResult* pFaceFrameResult = nullptr;
-				RectI faceBox = { 0 };
-				PointF facePoints[FacePointType::FacePointType_Count];
-				Vector4 faceRotation;
-				DetectionResult faceProperties[FaceProperty::FaceProperty_Count];
-
-
-				hr = pFaceFrame->get_FaceFrameResult(&pFaceFrameResult);
-
-				// need to verify if pFaceFrameResult contains data before trying to access it
-				if (SUCCEEDED(hr) && pFaceFrameResult != nullptr)
-				{
-					hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
-					// hr = pFaceFrameResult->get_FaceBoundingBoxInInfraredSpace(&faceBox);
-
-					pos_t pos = m_hHeads[iFace]->get_pos();
-					rot_t rot = m_hHeads[iFace]->get_rot();
-					
-					pos.axis[x] = (faceBox.Left + faceBox.Right) >> 1;
-					pos.axis[y] = (faceBox.Bottom + faceBox.Top) >> 1;
-					pos.axis[z] = dfd.get_depth(pos.axis[x], pos.axis[y]);
-					if (SUCCEEDED(hr))
-					{
-						hr = pFaceFrameResult->GetFacePointsInColorSpace(FacePointType::FacePointType_Count, facePoints);
-					}
-
-					if (SUCCEEDED(hr))
-					{
-						hr = pFaceFrameResult->get_FaceRotationQuaternion(&faceRotation);
-					}
-
-					// extract face rotation in degrees as Euler angles
-					getFaceRotationInDegrees(&faceRotation, &(rot.axis[yaw]), &(rot.axis[pitch]), &(rot.axis[roll]));
-					m_hHeads[iFace]->set_rot(rot);
-					m_hHeads[iFace]->set_pos(pos);
-					m_hHeads[iFace]->log_head_data();
-				}
-
-				SafeRelease(pFaceFrameResult);
-			}
-			else
-			{
-				// printf("not tracking face\n");
-				// face tracking is not valid - attempt to fix the issue
-				// a valid body is required to perform this step
-				if (bHaveBodyData)
-				{
-					// check if the corresponding body is tracked 
-					// if this is true then update the face frame source to track this body
-					IBody* pBody = ppBodies[iFace];
-					if (pBody != nullptr)
-					{
-						BOOLEAN bTracked = false;
-						hr = pBody->get_IsTracked(&bTracked);
-
-						UINT64 bodyTId;
-						if (SUCCEEDED(hr) && bTracked)
-						{
-							// get the tracking ID of this body
-							hr = pBody->get_TrackingId(&bodyTId);
-							if (SUCCEEDED(hr))
-							{
-								// update the face frame source with the tracking ID
-								m_pFaceFrameSources[iFace]->put_TrackingId(bodyTId);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		SafeRelease(pFaceFrame);
+		update_face(iFace, ppBodies, bHaveBodyData, dfd);
 	}
 
 	if (bHaveBodyData)
