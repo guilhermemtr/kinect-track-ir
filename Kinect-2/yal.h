@@ -20,11 +20,15 @@ extern FILE * __yal_output;
 #define __yal_set_lvl_warn() (__yal_dbg_lvl = __YAL_WARN)
 #define __yal_set_lvl_dbg() (__yal_dbg_lvl = __YAL_DBG)
 #define __yal_set_lvl_info() (__yal_dbg_lvl = __YAL_INFO)
+#define __yal_set_lvl_all() (__yal_dbg_lvl = __YAL_ALL)
 
 #define __YAL_ERROR 1
 #define __YAL_WARN 2
 #define __YAL_DBG 3
 #define __YAL_INFO 4
+#define __YAL_MISC 5
+
+#define __YAL_ALL 1000
 
 #define __YAL_ON__
 

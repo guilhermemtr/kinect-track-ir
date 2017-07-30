@@ -2,6 +2,9 @@
 
 #include "yal.h"
 
+#ifndef __HEAD_DATA__
+#define __HEAD_DATA__
+
 #define HEAD_DATA_AXIS 3
 
 typedef struct {
@@ -34,3 +37,5 @@ private:
 	rot_t rot;
 	uint64_t id;
 };
+
+#endif

@@ -2,13 +2,16 @@
 
 #include "yal.h"
 
+#ifndef __SUBSCRIBER__
+#define __SUBSCRIBER__
+
 template <class T> class subscriber
 {
 	template<class T> friend class publisher;
 public:
 	subscriber()
 	{
-		mtx = std::mutex();
+		//mtx = std::mutex();
 	}
 
 	~subscriber()
@@ -27,3 +30,4 @@ private:
 	std::mutex mtx;
 };
 
+#endif

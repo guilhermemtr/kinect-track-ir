@@ -3,6 +3,9 @@
 #include "yal.h"
 #include "subscriber.h"
 
+#ifndef __PUBLISHER__
+#define __PUBLISHER__
+
 // not thread safe
 template <class T> class publisher
 {
@@ -34,3 +37,4 @@ private:
 	std::list<subscriber<T>*> subs;
 };
 
+#endif

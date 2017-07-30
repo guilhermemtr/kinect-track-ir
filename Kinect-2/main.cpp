@@ -3,6 +3,7 @@
 
 #include "head_tracker.h"
 #include "yal.h"
+#include "logger_subscriber.h"
 
 int main() {
 	__yal_init_logger();
@@ -10,6 +11,10 @@ int main() {
 
 	head_tracker *ht = new head_tracker();
 	ht->setup();
+	
+	logger_subscriber *ls = new logger_subscriber();
+	//ht->add_subscriber(ls);
+
 	while (ht)
 	{
 		ht->update();
@@ -17,6 +22,8 @@ int main() {
 	}
 	int a;
 	std::cin >> a;
+
+	delete ls;
 
 	return 0;
 }

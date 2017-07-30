@@ -1,5 +1,9 @@
 #include <Kinect.h>
 #include <Kinect.Face.h>
+
+
+#include "publisher.h"
+
 #include "utils.h"
 
 #include "head_data.h"
@@ -7,7 +11,7 @@
 
 
 
-class head_tracker
+class head_tracker: public publisher<head_data>
 {
 public:
 	head_tracker();

@@ -190,7 +190,6 @@ void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, 
 			RectI faceBox = { 0 };
 			PointF facePoints[FacePointType::FacePointType_Count];
 			Vector4 faceRotation;
-			DetectionResult faceProperties[FaceProperty::FaceProperty_Count];
 
 
 			hr = pFaceFrame->get_FaceFrameResult(&pFaceFrameResult);
@@ -228,6 +227,7 @@ void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, 
 				getFaceRotationInDegrees(&faceRotation, &(rot.axis[yaw]), &(rot.axis[pitch]), &(rot.axis[roll]));
 				
 				m_hHeads[iFace]->update_data(ts, pos, rot);
+				this->publish(*m_hHeads[iFace]);
 				m_hHeads[iFace]->log_head_data();
 			}
 
@@ -273,8 +273,6 @@ void head_tracker::update()
 	{
 		return;
 	}
-	
-	HRESULT hr;
 
 	// get depth data.
 	// treat each of the bodies.

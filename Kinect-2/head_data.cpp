@@ -4,7 +4,7 @@
 
 head_data::head_data()
 {
-	__yal_log(__YAL_INFO, "Creating head_data object\n");
+	__yal_log(__YAL_MISC, "Creating head_data object\n");
 	for (int i = 0; i < HEAD_DATA_AXIS; i++)
 	{
 		this->rot.axis[i] = 0;
@@ -16,7 +16,7 @@ head_data::head_data()
 
 head_data::~head_data()
 {
-	__yal_log(__YAL_INFO, "Destroying head_data object\n");
+	__yal_log(__YAL_MISC, "Destroying head_data object\n");
 }
 
 
