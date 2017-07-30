@@ -29,8 +29,8 @@ extern FILE * __yal_output;
 #define __YAL_ON__
 
 #ifdef __YAL_ON__
-#define __yal_log(lvl,...) do {			\
-  if(__yal_dbg_lvl >= lvl)				\
+#define __yal_log(lvl,...) do {				\
+  if(__yal_dbg_lvl >= lvl)					\
     fprintf(__yal_output, __VA_ARGS__);		\
   } while(0)
 #else

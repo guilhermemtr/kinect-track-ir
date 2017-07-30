@@ -127,6 +127,7 @@
     <ClCompile Include="head_tracker.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utils.cpp" />
+    <ClCompile Include="yal.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="depth_frame_data.h" />

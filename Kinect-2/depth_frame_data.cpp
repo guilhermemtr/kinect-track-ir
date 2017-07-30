@@ -16,6 +16,7 @@ depth_frame_data::depth_frame_data(IDepthFrameReader * depthFrameReader) :
 
 	if (SUCCEEDED(hr))
 	{
+		__yal_log(__YAL_INFO, "depth_frame_data::depth_frame_data: got depth frame");
 		hr = m_pDepthFrame->get_FrameDescription(&m_pFrameDescription);
 		if (SUCCEEDED(hr))
 		{
@@ -52,23 +53,18 @@ depth_frame_data::depth_frame_data(IDepthFrameReader * depthFrameReader) :
 			hr = m_pDepthFrame->AccessUnderlyingBuffer(&m_nBufferSize, &m_pBuffer);
 		}
 
-		if (FAILED(hr))
-		{
-			printf("error depth frame description: %d\n", hr);
-		}
-		
+		//if (FAILED(hr))
+		//{
+		//	printf("error depth frame description: %d\n", hr);
+		//}
+		SafeRelease(m_pFrameDescription);
 	}
-	else
-	{
-		printf("error depth frame: %d\n", hr);
-	}
-
 	
-
+	// failed getting depth frame
 	if (FAILED(hr))
 	{
-	//	m_pBuffer = NULL;
-		printf("error getting depth frame: %d\n", hr);
+		__yal_log(__YAL_DBG, "error getting depth frame: %d\t\t%p\n", hr, m_pDepthFrame);
+		m_pDepthFrame = NULL;
 	}
 }
 

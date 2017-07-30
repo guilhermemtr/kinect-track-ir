@@ -168,7 +168,7 @@ head_data* head_tracker::get_head_data(int i)
 	return m_hHeads[i];
 }
 
-void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, depth_frame_data dfd)
+void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, depth_frame_data& dfd)
 {
 	// retrieve the latest face frame from this reader
 	IFaceFrame* pFaceFrame = nullptr;
@@ -259,7 +259,6 @@ void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, 
 
 	SafeRelease(pFaceFrame);
 }
-
 
 void head_tracker::update()
 {

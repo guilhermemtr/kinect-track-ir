@@ -41,9 +41,9 @@ void head_data::set_rot(rot_t rot)
 
 void head_data::log_head_data(void)
 {
-	__yal_log(__YAL_INFO, "\t\tRotation\t\tPosition\n");
+	__yal_log(__YAL_DBG, "\t\tRotation\t\tPosition\n");
 	for (int i = 0; i < HEAD_DATA_AXIS; i++)
 	{
-		__yal_log(__YAL_INFO, "%d:\t\t%d\t\t%d\n", i, rot.axis[i], pos.axis[i]);
+		__yal_log(__YAL_DBG, "%d:\t\t%d\t\t%d\n", i, rot.axis[i], pos.axis[i]);
 	}
 }
