@@ -39,6 +39,9 @@
     <ClCompile Include="head_data_smoothener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="head_data_filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head_tracker.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="head_data_smoothener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="head_data_filter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
