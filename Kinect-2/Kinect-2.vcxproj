@@ -124,6 +124,7 @@
   <ItemGroup>
     <ClCompile Include="depth_frame_data.cpp" />
     <ClCompile Include="head_data.cpp" />
+    <ClCompile Include="head_data_smoothener.cpp" />
     <ClCompile Include="head_tracker.cpp" />
     <ClCompile Include="logger_subscriber.cpp" />
     <ClCompile Include="main.cpp" />
@@ -133,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="depth_frame_data.h" />
     <ClInclude Include="head_data.h" />
+    <ClInclude Include="head_data_smoothener.h" />
     <ClInclude Include="head_tracker.h" />
     <ClInclude Include="logger_subscriber.h" />
     <ClInclude Include="publisher.h" />

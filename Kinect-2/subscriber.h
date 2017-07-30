@@ -11,7 +11,6 @@ template <class T> class subscriber
 public:
 	subscriber()
 	{
-		//mtx = std::mutex();
 	}
 
 	~subscriber()

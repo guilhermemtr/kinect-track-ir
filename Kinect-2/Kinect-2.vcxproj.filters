@@ -36,6 +36,9 @@
     <ClCompile Include="logger_subscriber.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="head_data_smoothener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head_tracker.h">
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="logger_subscriber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="head_data_smoothener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

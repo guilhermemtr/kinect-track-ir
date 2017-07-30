@@ -4,6 +4,7 @@
 #include "head_tracker.h"
 #include "yal.h"
 #include "logger_subscriber.h"
+#include "head_data_smoothener.h"
 
 int main() {
 	__yal_init_logger();
@@ -12,8 +13,12 @@ int main() {
 	head_tracker *ht = new head_tracker();
 	ht->setup();
 	
+
+	head_data_smoothener *hds = new head_data_smoothener(0.3);
 	logger_subscriber *ls = new logger_subscriber();
-	//ht->add_subscriber(ls);
+	ht->add_subscriber(hds);
+
+	hds->add_subscriber(ls);
 
 	while (ht)
 	{

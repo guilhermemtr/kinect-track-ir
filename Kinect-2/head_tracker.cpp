@@ -228,7 +228,6 @@ void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, 
 				
 				m_hHeads[iFace]->update_data(ts, pos, rot);
 				this->publish(*m_hHeads[iFace]);
-				m_hHeads[iFace]->log_head_data();
 			}
 
 			SafeRelease(pFaceFrameResult);
