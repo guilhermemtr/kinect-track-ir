@@ -53,6 +53,12 @@
     <ClInclude Include="depth_frame_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="publisher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="subscriber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Kinect-2.rc">

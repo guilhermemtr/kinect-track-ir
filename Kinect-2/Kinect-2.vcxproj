@@ -133,7 +133,9 @@
     <ClInclude Include="depth_frame_data.h" />
     <ClInclude Include="head_data.h" />
     <ClInclude Include="head_tracker.h" />
+    <ClInclude Include="publisher.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="subscriber.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="yal.h" />
   </ItemGroup>

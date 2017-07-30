@@ -10,6 +10,7 @@ head_data::head_data()
 		this->rot.axis[i] = 0;
 		this->pos.axis[i] = 0;
 	}
+	this->id = 0;
 }
 
 
@@ -18,6 +19,11 @@ head_data::~head_data()
 	__yal_log(__YAL_INFO, "Destroying head_data object\n");
 }
 
+
+uint64_t head_data::get_id()
+{
+	return this->id;
+}
 
 pos_t head_data::get_pos()
 {
@@ -29,14 +35,12 @@ rot_t head_data::get_rot()
 	return this->rot;
 }
 
-void head_data::set_pos(pos_t pos)
+void head_data::update_data(uint64_t id, pos_t pos, rot_t rot)
 {
 	this->pos = pos;
-}
-
-void head_data::set_rot(rot_t rot)
-{
 	this->rot = rot;
+	this->id = id;
+
 }
 
 void head_data::log_head_data(void)

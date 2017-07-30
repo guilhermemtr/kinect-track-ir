@@ -21,15 +21,16 @@ public:
 	head_data();
 	~head_data();
 
+	uint64_t get_id();
 	pos_t get_pos();
 	rot_t get_rot();
 
-	void set_pos(pos_t pos);
-	void set_rot(rot_t rot);
+	void update_data(uint64_t id, pos_t pos, rot_t rot);
 
 	// shouldn't exist: only for debugging
 	void log_head_data(void);
 private:
 	pos_t pos;
 	rot_t rot;
+	uint64_t id;
 };

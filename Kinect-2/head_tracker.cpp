@@ -201,12 +201,14 @@ void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, 
 				// hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&faceBox);
 				hr = pFaceFrameResult->get_FaceBoundingBoxInInfraredSpace(&faceBox);
 
+				TIMESPAN ts;
 				pos_t pos = m_hHeads[iFace]->get_pos();
 				rot_t rot = m_hHeads[iFace]->get_rot();
 
 				pos.axis[x] = (faceBox.Left + faceBox.Right) >> 1;
 				pos.axis[y] = (faceBox.Bottom + faceBox.Top) >> 1;
 				pos.axis[z] = dfd.get_depth(pos.axis[x], pos.axis[y]);
+
 				if (SUCCEEDED(hr))
 				{
 					hr = pFaceFrameResult->GetFacePointsInColorSpace(FacePointType::FacePointType_Count, facePoints);
@@ -217,10 +219,15 @@ void head_tracker::update_face(int iFace, IBody** ppBodies, bool bHaveBodyData, 
 					hr = pFaceFrameResult->get_FaceRotationQuaternion(&faceRotation);
 				}
 
+				if (SUCCEEDED(hr))
+				{
+					hr = pFaceFrameResult->get_RelativeTime(&ts);
+				}
+
 				// extract face rotation in degrees as Euler angles
 				getFaceRotationInDegrees(&faceRotation, &(rot.axis[yaw]), &(rot.axis[pitch]), &(rot.axis[roll]));
-				m_hHeads[iFace]->set_rot(rot);
-				m_hHeads[iFace]->set_pos(pos);
+				
+				m_hHeads[iFace]->update_data(ts, pos, rot);
 				m_hHeads[iFace]->log_head_data();
 			}
 
