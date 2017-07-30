@@ -6,13 +6,14 @@
 #define __HEAD_DATA__
 
 #define HEAD_DATA_AXIS 3
+typedef int64_t head_data_axis_t;
 
 typedef struct {
-	int64_t axis[HEAD_DATA_AXIS];
+	head_data_axis_t axis[HEAD_DATA_AXIS];
 } pos_t;
 
 typedef struct {
-	int axis[HEAD_DATA_AXIS];
+	head_data_axis_t axis[HEAD_DATA_AXIS];
 } rot_t;
 
 enum axis {x = 0, y, z};

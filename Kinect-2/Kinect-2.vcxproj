@@ -122,6 +122,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="average_head_position.cpp" />
     <ClCompile Include="depth_frame_data.cpp" />
     <ClCompile Include="head_data.cpp" />
     <ClCompile Include="head_data_filter.cpp" />
@@ -133,6 +134,7 @@
     <ClCompile Include="yal.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="average_head_position.h" />
     <ClInclude Include="depth_frame_data.h" />
     <ClInclude Include="head_data.h" />
     <ClInclude Include="head_data_filter.h" />
@@ -150,6 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

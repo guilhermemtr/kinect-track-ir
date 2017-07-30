@@ -42,6 +42,9 @@
     <ClCompile Include="head_data_filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="average_head_position.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head_tracker.h">
@@ -77,6 +80,9 @@
     <ClInclude Include="head_data_filter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="average_head_position.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Kinect-2.rc">
@@ -85,5 +91,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
   </ItemGroup>
 </Project>

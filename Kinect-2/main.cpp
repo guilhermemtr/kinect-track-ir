@@ -21,6 +21,7 @@ int main() {
 	hdf->add_subscriber(hds);
 	hds->add_subscriber(ls);
 
+
 	while (ht)
 	{
 		ht->update();
