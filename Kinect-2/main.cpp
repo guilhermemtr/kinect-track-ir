@@ -17,7 +17,7 @@ int main() {
 	
 	head_data_filter *hdf = new head_data_filter();
 	head_data_smoothener *hds = new head_data_smoothener(0.2);
-	average_head_positioning *ahp = new average_head_positioning(1.0);
+	average_head_positioning *ahp = new average_head_positioning(0.10);
 	logger_subscriber *ls1 = new logger_subscriber();
 	logger_subscriber *ls2 = new logger_subscriber();
 

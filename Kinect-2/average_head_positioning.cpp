@@ -21,20 +21,10 @@ void average_head_positioning::callback(head_data hd)
 {
 	pos_t n_p = hd.get_pos();
 	rot_t n_r = hd.get_rot();
-
-	for (int i = 0; i < HEAD_DATA_AXIS; i++)
-	{
-		if (n_p.axis[i] < 0 || n_p.axis[i] > 1500) {
-			printf("Weird value pos\n");
-		}
-		if (n_r.axis[i] < -180 || n_r.axis[i] > 180) {
-			printf("Weird value rot\n");
-		}
-	}
 	
 	if (!account(hd))
 	{
-		//return;
+		return;
 	}
 
 	if (!count)
@@ -45,27 +35,14 @@ void average_head_positioning::callback(head_data hd)
 	{
 		aggregate = aggregate + hd;
 	}
-	count++;
 
+	count++;
 	this->publish(this->get_center());
 }
 
 head_data average_head_positioning::get_center()
 {
-	pos_t c_p = aggregate.get_pos();
-	rot_t c_r = aggregate.get_rot();
-	pos_t m_p;
-	rot_t m_r;
-
-	for (int i = 0; i < HEAD_DATA_AXIS; i++)
-	{
-		m_p.axis[i] = c_p.axis[i]/count;
-		m_r.axis[i] = c_r.axis[i]/count;
-	}
-
-	head_data tmp;
-	tmp.update_data(0, m_p, m_r);
-	return tmp;
+	return aggregate / count;
 }
 
 bool average_head_positioning::account(head_data hd)
@@ -87,22 +64,24 @@ bool average_head_positioning::account(head_data hd)
 		{
 			return false;
 		}
+		
 		if (a_r.axis[i] > range_rot.axis[i] || a_r.axis[i] < -range_rot.axis[i])
 		{
 			return false;
 		}
-		if (a_r.axis[i] > 200 || a_r.axis[i] < -200) printf("whot?\n");
-		/*account = account &&
+
+		account = account &&
 					account_val(a_p.axis[i], m_p.axis[i], range_pos.axis[i]) &&
 					account_val(a_r.axis[i], m_r.axis[i], range_rot.axis[i]);
-					*/
+					
 	}
-	return account || true;
+	return account;
 }
 
 bool average_head_positioning::account_val(head_data_axis_t v_hd, head_data_axis_t v_c, head_data_axis_t range)
 {
-	head_data_axis_t threshold = range * factor;
+	float l_factor = count < (1.0 / factor) ? factor * (count + 1) : factor;
+	head_data_axis_t threshold = range * l_factor;
 	printf("threshold: %d\n", threshold);
 
 	head_data_axis_t min_c = v_c - threshold;

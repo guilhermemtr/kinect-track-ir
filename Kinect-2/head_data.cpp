@@ -82,11 +82,11 @@ void head_data::update_data(uint64_t id, pos_t pos, rot_t rot)
 
 }
 
-void head_data::log_head_data(void)
+void head_data::log_head_data(char *prefix)
 {
-	__yal_log(__YAL_DBG, "\t\tRotation\t\tPosition\n");
+	__yal_log(__YAL_DBG, "%s\t\tRotation\tPosition\n", prefix);
 	for (int i = 0; i < HEAD_DATA_AXIS; i++)
 	{
-		__yal_log(__YAL_DBG, "%d:\t\t%d\t\t%d\n", i, rot.axis[i], pos.axis[i]);
+		__yal_log(__YAL_DBG, "%s%ld:\t\t%ld\t\t%ld\n", prefix, i, rot.axis[i], pos.axis[i]);
 	}
 }

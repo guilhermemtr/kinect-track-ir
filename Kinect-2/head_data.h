@@ -89,7 +89,7 @@ public:
 	void update_data(uint64_t id, pos_t pos, rot_t rot);
 
 	// shouldn't exist: only for debugging
-	void log_head_data(void);
+	void log_head_data(char *prefix);
 private:
 	pos_t pos;
 	rot_t rot;
