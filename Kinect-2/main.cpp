@@ -6,6 +6,7 @@
 #include "logger_subscriber.h"
 #include "head_data_smoothener.h"
 #include "head_data_filter.h"
+#include "average_head_positioning.h"
 
 int main() {
 	__yal_init_logger();
@@ -16,10 +17,15 @@ int main() {
 	
 	head_data_filter *hdf = new head_data_filter();
 	head_data_smoothener *hds = new head_data_smoothener(0.2);
-	logger_subscriber *ls = new logger_subscriber();
+	average_head_positioning *ahp = new average_head_positioning(1.0);
+	logger_subscriber *ls1 = new logger_subscriber();
+	logger_subscriber *ls2 = new logger_subscriber();
+
 	ht->add_subscriber(hdf);
 	hdf->add_subscriber(hds);
-	hds->add_subscriber(ls);
+	hds->add_subscriber(ahp);
+	//hds->add_subscriber(ls1);
+	ahp->add_subscriber(ls2);
 
 
 	while (ht)
@@ -30,7 +36,6 @@ int main() {
 	int a;
 	std::cin >> a;
 
-	delete ls;
 
 	return 0;
 }

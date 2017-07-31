@@ -6,7 +6,10 @@
 #define __HEAD_DATA__
 
 #define HEAD_DATA_AXIS 3
+
+
 typedef int64_t head_data_axis_t;
+#define ABS_HEAD_DATA_AXIS(val) (INT64_MAX & val)
 
 typedef struct {
 	head_data_axis_t axis[HEAD_DATA_AXIS];

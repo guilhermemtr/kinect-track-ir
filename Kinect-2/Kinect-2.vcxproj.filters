@@ -42,7 +42,7 @@
     <ClCompile Include="head_data_filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="average_head_position.cpp">
+    <ClCompile Include="average_head_positioning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,7 +80,7 @@
     <ClInclude Include="head_data_filter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="average_head_position.h">
+    <ClInclude Include="average_head_positioning.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

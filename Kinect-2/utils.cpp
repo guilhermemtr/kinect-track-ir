@@ -25,7 +25,7 @@ void handleError(HRESULT hr, int critical, char* msg, ...)
 
 
 
-void getFaceRotationInDegrees(const Vector4* pQuaternion, int* pYaw, int* pPitch, int* pRoll)
+void getFaceRotationInDegrees(const Vector4* pQuaternion, int64_t* pYaw, int64_t* pPitch, int64_t* pRoll)
 {
 	double x = pQuaternion->x;
 	double y = pQuaternion->y;
