@@ -4,8 +4,8 @@
 
 average_head_positioning::average_head_positioning(float factor)
 {
-	pos_t center = { __AVG_HEAD_POS_WIDTH__, __AVG_HEAD_POS_HEIGHT__, __AVG_HEAD_POS_DEPTH__ };
-	rot_t no_rot = { 0, 0, 0 };
+	pos_t center = {0, 0, 0};
+	rot_t no_rot = {0, 0, 0};
 	perfect_center.update_data(0, center, no_rot);
 	aggregate = perfect_center; // because I can
 	count = 0;
@@ -19,9 +19,22 @@ average_head_positioning::~average_head_positioning()
 
 void average_head_positioning::callback(head_data hd)
 {
+	pos_t n_p = hd.get_pos();
+	rot_t n_r = hd.get_rot();
+
+	for (int i = 0; i < HEAD_DATA_AXIS; i++)
+	{
+		if (n_p.axis[i] < 0 || n_p.axis[i] > 1500) {
+			printf("Weird value pos\n");
+		}
+		if (n_r.axis[i] < -180 || n_r.axis[i] > 180) {
+			printf("Weird value rot\n");
+		}
+	}
+	
 	if (!account(hd))
 	{
-		return;
+		//return;
 	}
 
 	if (!count)
@@ -30,19 +43,7 @@ void average_head_positioning::callback(head_data hd)
 	}
 	else
 	{
-		pos_t c_p = aggregate.get_pos();
-		rot_t c_r = aggregate.get_rot();
-
-		pos_t n_p = hd.get_pos();
-		rot_t n_r = hd.get_rot();
-
-		for (int i = 0; i < HEAD_DATA_AXIS; i++)
-		{
-			c_p.axis[i] += n_p.axis[i];
-			c_r.axis[i] += n_r.axis[i];
-		}
-
-		aggregate.update_data(count, c_p, c_r);
+		aggregate = aggregate + hd;
 	}
 	count++;
 

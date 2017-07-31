@@ -35,6 +35,45 @@ rot_t head_data::get_rot()
 	return this->rot;
 }
 
+head_data head_data::operator+(head_data d)
+{
+	pos_t d_p = d.get_pos();
+	rot_t d_r = d.get_rot();
+
+	head_data n;
+	n.update_data(id, d_p + pos, d_r + rot);
+	return n;
+}
+
+head_data head_data::operator-(head_data d)
+{
+	pos_t d_p = d.get_pos();
+	rot_t d_r = d.get_rot();
+
+	head_data n;
+	n.update_data(id, d_p - pos, d_r - rot);
+	return n;
+}
+
+head_data head_data::operator/(int64_t count)
+{
+	head_data n;
+	n.update_data(id, pos/count, rot/count);
+	return n;
+}
+
+void head_data::operator+=(head_data d)
+{
+	pos = pos + d.get_pos();
+	rot = rot + d.get_rot();
+}
+
+void head_data::operator-=(head_data d)
+{
+	pos = pos - d.get_pos();
+	rot = rot - d.get_rot();
+}
+
 void head_data::update_data(uint64_t id, pos_t pos, rot_t rot)
 {
 	this->pos = pos;
