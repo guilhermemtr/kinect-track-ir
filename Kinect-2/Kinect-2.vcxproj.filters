@@ -45,6 +45,9 @@
     <ClCompile Include="average_head_positioning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dcs_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head_tracker.h">
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="average_head_positioning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcs_client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

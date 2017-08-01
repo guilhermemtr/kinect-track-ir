@@ -7,7 +7,7 @@
 
 #define __AVG_HEAD_POS_WIDTH__  (512)
 #define __AVG_HEAD_POS_HEIGHT__ (424)
-#define __AVG_HEAD_POS_DEPTH__  (1600)
+#define __AVG_HEAD_POS_DEPTH__  (600)
 #define __MAX_HEAD_ROT_YAW__    (180)
 #define __MAX_HEAD_ROT_PITCH__  (180)
 #define __MAX_HEAD_ROT_ROLL__   (180)
