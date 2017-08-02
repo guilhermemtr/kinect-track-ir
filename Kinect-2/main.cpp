@@ -1,12 +1,20 @@
 #include <chrono>
 #include <thread>
 
-#include "head_tracker.h"
-#include "yal.h"
 #include "logger_subscriber.h"
+#include "normalized_logger_subscriber.h"
+
+#include "head_tracker.h"
+
 #include "head_data_smoothener.h"
 #include "head_data_filter.h"
 #include "average_head_positioning.h"
+
+#include "head_data_multiplier.h"
+#include "head_data_normalizer.h"
+
+
+#include "yal.h"
 
 int main() {
 	__yal_init_logger();
@@ -16,14 +24,25 @@ int main() {
 	ht->setup();
 	
 	head_data_filter *hdf = new head_data_filter();
+	ht->add_subscriber(hdf);
+
 	head_data_smoothener *hds = new head_data_smoothener(0.2);
+	hdf->add_subscriber(hds);
+
 	average_head_positioning *ahp = new average_head_positioning(0.10);
+	hds->add_subscriber(ahp);
+
+	head_data_nor
+
+
+
+
+
+
 	logger_subscriber *ls1 = new logger_subscriber();
 	logger_subscriber *ls2 = new logger_subscriber();
 
-	ht->add_subscriber(hdf);
-	hdf->add_subscriber(hds);
-	hds->add_subscriber(ahp);
+
 	//hds->add_subscriber(ls1);
 	ahp->add_subscriber(ls2);
 
