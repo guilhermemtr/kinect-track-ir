@@ -5,6 +5,9 @@
 
 #include "head_data.h"
 
+#ifndef __AVG_HEAD_POSITIONING__
+#define __AVG_HEAD_POSITIONING__
+
 #define __AVG_HEAD_POS_WIDTH__  (512)
 #define __AVG_HEAD_POS_HEIGHT__ (424)
 #define __AVG_HEAD_POS_DEPTH__  (600)
@@ -34,3 +37,4 @@ private:
 	const rot_t range_rot = { __MAX_HEAD_ROT_YAW__ , __MAX_HEAD_ROT_PITCH__ , __MAX_HEAD_ROT_ROLL__ };
 };
 
+#endif

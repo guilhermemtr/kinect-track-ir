@@ -32,19 +32,26 @@ int main() {
 	average_head_positioning *ahp = new average_head_positioning(0.10);
 	hds->add_subscriber(ahp);
 
-	head_data_nor
+	head_data_normalizer *hdn = new head_data_normalizer(ahp);
+	hds->add_subscriber(hdn);
+
+	head_data_multiplier *hdm = new head_data_multiplier(1.0, 1.0, 1.0, 1.0, 1.0, 1.0);
+	hdn->add_subscriber(hdm);
+
+	normalized_logger_subscriber *nls1 = new normalized_logger_subscriber("");
+	normalized_logger_subscriber *nls2 = new normalized_logger_subscriber("");
 
 
 
 
 
 
-	logger_subscriber *ls1 = new logger_subscriber();
-	logger_subscriber *ls2 = new logger_subscriber();
+	// logger_subscriber *ls1 = new logger_subscriber();
+	// logger_subscriber *ls2 = new logger_subscriber();
 
 
 	//hds->add_subscriber(ls1);
-	ahp->add_subscriber(ls2);
+	// ahp->add_subscriber(ls2);
 
 
 	while (ht)

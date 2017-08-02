@@ -7,10 +7,13 @@
 class normalized_logger_subscriber: public subscriber<normalized_head_data>
 {
 public:
-	normalized_logger_subscriber();
+	normalized_logger_subscriber(char *prefix);
 	~normalized_logger_subscriber();
 
-	void callback(head_data hd);
+	void callback(normalized_head_data hd);
+
+private:
+	char *prefix;
 };
 
 #endif

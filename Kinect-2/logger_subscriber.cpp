@@ -2,8 +2,9 @@
 
 
 
-logger_subscriber::logger_subscriber()
+logger_subscriber::logger_subscriber(char *prefix)
 {
+	this->prefix = prefix;
 }
 
 

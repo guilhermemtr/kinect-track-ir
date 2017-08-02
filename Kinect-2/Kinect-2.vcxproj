@@ -134,6 +134,7 @@
     <ClCompile Include="logger_subscriber.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="normalized_head_data.cpp" />
+    <ClCompile Include="normalized_logger_subscriber.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="yal.cpp" />
   </ItemGroup>
@@ -149,6 +150,7 @@
     <ClInclude Include="head_tracker.h" />
     <ClInclude Include="logger_subscriber.h" />
     <ClInclude Include="normalized_head_data.h" />
+    <ClInclude Include="normalized_logger_subscriber.h" />
     <ClInclude Include="publisher.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="subscriber.h" />

@@ -2,8 +2,9 @@
 
 
 
-normalized_logger_subscriber::normalized_logger_subscriber()
+normalized_logger_subscriber::normalized_logger_subscriber(char *prefix)
 {
+	this->prefix = prefix;
 }
 
 
@@ -11,7 +12,7 @@ normalized_logger_subscriber::~normalized_logger_subscriber()
 {
 }
 
-void normalized_logger_subscriber::callback(head_data hd)
+void normalized_logger_subscriber::callback(normalized_head_data hd)
 {
-	hd.log_head_data("");
+	hd.log_normalized_head_data("");
 }

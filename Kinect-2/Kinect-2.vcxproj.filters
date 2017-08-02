@@ -57,6 +57,9 @@
     <ClCompile Include="normalized_head_data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="normalized_logger_subscriber.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head_tracker.h">
@@ -105,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="normalized_head_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="normalized_logger_subscriber.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
