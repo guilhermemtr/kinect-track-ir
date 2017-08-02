@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <algorithm>
+#include <iostream>
 
 #include "yal.h"
 
@@ -46,7 +48,7 @@ typedef struct axis_s {
 		struct axis_s n;
 		for (int i = 0; i < HEAD_DATA_AXIS; i++)
 		{
-			n.axis[i] = axis[i] / count;
+			n.axis[i] = axis[i] / (count == 0 ? 1 : count);
 		}
 		return n;
 	}

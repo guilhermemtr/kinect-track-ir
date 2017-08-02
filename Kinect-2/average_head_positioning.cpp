@@ -82,7 +82,6 @@ bool average_head_positioning::account_val(head_data_axis_t v_hd, head_data_axis
 {
 	float l_factor = count < (1.0 / factor) ? factor * (count + 1) : factor;
 	head_data_axis_t threshold = range * l_factor;
-	printf("threshold: %d\n", threshold);
 
 	head_data_axis_t min_c = v_c - threshold;
 	head_data_axis_t max_c = v_c + threshold;
