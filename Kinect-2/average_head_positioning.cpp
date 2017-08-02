@@ -60,10 +60,10 @@ bool average_head_positioning::account(head_data hd)
 
 	for (int i = 0; i < HEAD_DATA_AXIS; i++)
 	{
-		if (a_p.axis[i] > range_pos.axis[i] || a_p.axis[i] < -range_pos.axis[i])
-		{
-			return false;
-		}
+		//if (a_p.axis[i] > range_pos.axis[i] || a_p.axis[i] < -range_pos.axis[i])
+		//{
+		//	return false;
+		//}
 		
 		if (a_r.axis[i] > range_rot.axis[i] || a_r.axis[i] < -range_rot.axis[i])
 		{
