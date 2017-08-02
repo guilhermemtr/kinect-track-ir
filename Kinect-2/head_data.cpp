@@ -79,7 +79,6 @@ void head_data::update_data(uint64_t id, pos_t pos, rot_t rot)
 	this->pos = pos;
 	this->rot = rot;
 	this->id = id;
-
 }
 
 void head_data::log_head_data(char *prefix)

@@ -48,6 +48,15 @@
     <ClCompile Include="dcs_client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="head_data_normalizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="head_data_multiplier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="normalized_head_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="head_tracker.h">
@@ -87,6 +96,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dcs_client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="head_data_normalizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="head_data_multiplier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="normalized_head_data.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

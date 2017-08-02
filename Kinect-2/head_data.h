@@ -9,6 +9,7 @@
 
 
 typedef int64_t head_data_axis_t;
+
 #define ABS_HEAD_DATA_AXIS(val) (INT64_MAX & val)
 
 typedef struct axis_s {
