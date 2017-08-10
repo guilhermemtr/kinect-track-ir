@@ -1,2 +1,3 @@
-develop head center
 develop game subscriber
+
+make the head_data_multiplier dynamic over time (change the multipliers to match the maximum I've turned or changed my head's position)
