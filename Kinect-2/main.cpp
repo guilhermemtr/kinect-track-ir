@@ -35,7 +35,7 @@ int main() {
 	head_data_normalizer *hdn = new head_data_normalizer(ahp);
 	hds->add_subscriber(hdn);
 
-	head_data_multiplier *hdm = new head_data_multiplier(2.0, 2.0, 2.0, 2.0, 2.0, 2.0);
+	head_data_multiplier *hdm = new head_data_multiplier(0.75, 0.75, 0.75, 0.75, 0.75, 0.75);
 	hdn->add_subscriber(hdm);
 
 	normalized_logger_subscriber *nls = new normalized_logger_subscriber("");
